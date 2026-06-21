@@ -9,7 +9,7 @@ st.set_page_config(page_title="Controle de Gastos Compartilhado", page_icon="�
 
 # --- CONEXÃO COM O SUPABASE (VIA API) ---
 # Substitua com os dados que você copiou do Passo 2
-SUPABASE_URL = "https://sfvfxkxwqvbekdtufxby.supabase.co/rest/v1/"
+SUPABASE_URL = "https://sfvfxkxwqvbekdtufxby.supabase.co/rest/v1/compras"
 SUPABASE_KEY = "sb_publishable_rZebB_4zb2V58wfJ6Vf5sQ_rUmDq1QT"
 
 # Inicializa o cliente do banco de dados
