@@ -1,60 +1,48 @@
 import streamlit as st
-import psycopg2
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+from sqlalchemy import create_engine, text
 
 # Configuração da página para o celular
 st.set_page_config(page_title="Controle de Gastos Compartilhado", page_icon="📊", layout="centered")
 
-# --- CONEXÃO COM O BANCO DE DADOS (SUPABASE - POSTGRESQL) ---
-# Substitua o texto abaixo pela sua URI do Supabase com a sua senha real!
-DB_URI = "postgresql://postgres:joh0703201404061994@aws-0-sa-east-1.pooler.supabase.com::5432/postgres"
+# --- CONEXÃO COM O BANCO DE DADOS (SUPABASE VIA SQLALCHEMY) ---
+# Mudamos o início para 'postgresql+pg8000://' e usamos a porta pooler 6543
+DB_URI = "postgresql+pg8000://postgres:joh0703201404061994@aws-0-sa-east-1.pooler.supabase.com:6543/postgres"
 
-def conectar_banco():
-    # Conecta direto no banco de dados na nuvem
-    conn = psycopg2.connect(DB_URI)
-    return conn
+# Cria o motor de conexão
+engine = create_engine(DB_URI, pool_pre_ping=True)
 
 # Cria a tabela na nuvem se ela ainda não existir
 def criar_tabela():
-    conn = conectar_banco()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS compras (
-            id SERIAL PRIMARY KEY,
-            estabelecimento TEXT,
-            valor REAL,
-            tipo TEXT,
-            categoria TEXT,
-            data TEXT
-        )
-    """)
-    conn.commit()
-    cursor.close()
-    conn.close()
+    with engine.begin() as conn:
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS compras (
+                id SERIAL PRIMARY KEY,
+                estabelecimento TEXT,
+                valor REAL,
+                tipo TEXT,
+                categoria TEXT,
+                data TEXT
+            )
+        """))
 
 # Executa a criação da tabela logo na abertura do app
 criar_tabela()
 
 def salvar_gasto(estabelecimento, valor, tipo, categoria):
-    conn = conectar_banco()
-    cursor = conn.cursor()
     data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
-    cursor.execute(
-        "INSERT INTO compras (estabelecimento, valor, tipo, categoria, data) VALUES (%s, %s, %s, %s, %s)",
-        (estabelecimento, valor, tipo, categoria, data_atual)
-    )
-    conn.commit()
-    cursor.close()
-    conn.close()
+    with engine.begin() as conn:
+        conn.execute(
+            text("INSERT INTO compras (estabelecimento, valor, tipo, categoria, data) VALUES (:est, :val, :tipo, :cat, :data)"),
+            {"est": estabelecimento, "val": valor, "tipo": tipo, "cat": categoria, "data": data_atual}
+        )
 
 def ler_gastos():
-    conn = conectar_banco()
-    df = pd.read_sql_query("SELECT estabelecimento, valor, tipo, categoria, data FROM compras ORDER BY id DESC", conn)
-    conn.close()
+    with engine.connect() as conn:
+        df = pd.read_sql_query(text("SELECT estabelecimento, valor, tipo, categoria, data FROM compras ORDER BY id DESC"), conn)
     return df
-
 # --- INTERFACE DO APLICATIVO ---
 
 st.title("📊 Nosso Gestor Financeiro")

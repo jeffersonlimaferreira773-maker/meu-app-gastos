@@ -1,3 +1,4 @@
 pandas
 plotly
-psycopg2-binary
+sqlalchemy
+pg8000
