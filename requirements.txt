@@ -1,4 +1,3 @@
 pandas
 plotly
-sqlalchemy
-pg8000
+supabase
