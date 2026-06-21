@@ -11,7 +11,7 @@ st.set_page_config(page_title="Controle de Gastos Compartilhado", page_icon="�
 # Mudamos o início para 'postgresql+pg8000://' e usamos a porta pooler 6543
 DB_URI = "postgresql+pg8000://postgres:joh0703201404061994@aws-0-sa-east-1.pooler.supabase.com:6543/postgres"
 
-# Cria o motor de conexão
+# Cria o motor de conexão 
 engine = create_engine(DB_URI, pool_pre_ping=True)
 
 # Cria a tabela na nuvem se ela ainda não existir
