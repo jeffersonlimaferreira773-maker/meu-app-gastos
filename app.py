@@ -9,7 +9,7 @@ st.set_page_config(page_title="Controle de Gastos Compartilhado", page_icon="ðŸ“
 
 # --- CONEXÃƒO COM O BANCO DE DADOS (SUPABASE - POSTGRESQL) ---
 # Substitua o texto abaixo pela sua URI do Supabase com a sua senha real!
-DB_URI = "postgresql://postgres:Joh07032014@%%@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
+DB_URI = "postgresql://postgres:joh0703201404061994@aws-0-sa-east-1.pooler.supabase.com::5432/postgres"
 
 def conectar_banco():
     # Conecta direto no banco de dados na nuvem
