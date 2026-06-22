@@ -9,7 +9,7 @@ st.set_page_config(page_title="Controle de Gastos Compartilhado", page_icon="�
 
 # --- CONEXÃO COM O SUPABASE (VIA API) ---
 # Substitua com os dados que você copiou do Passo 2
-SUPABASE_URL = "https://sfvfxkxwqvbekdtufxby.supabase.co/rest/v1/compras"
+SUPABASE_URL = "https://supabase.com/dashboard/project/sfvfxkxwqvbekdtufxby/editor/17584?schema=public"
 SUPABASE_KEY = "sb_publishable_rZebB_4zb2V58wfJ6Vf5sQ_rUmDq1QT"
 
 # Inicializa o cliente do banco de dados
@@ -24,14 +24,17 @@ def salvar_gasto(estabelecimento, valor, tipo, categoria):
         "categoria": categoria,
         "data": data_atual
     }
-    # Insere diretamente na tabela do Supabase
-    supabase.table("compras").insert(dados).execute()
+    # Força o uso do schema public explicitamente
+    supabase.schema("public").table("compras").insert(dados).execute()
 
 def ler_gastos():
-    # Busca todas as linhas da tabela
-    resposta = supabase.table("compras").select("*").order("id", desc=True).execute()
-    if resposta.data:
-        return pd.DataFrame(resposta.data)
+    try:
+        resposta = supabase.schema("public").table("compras").select("*").order("id", desc=True).execute()
+        if resposta.data:
+            return pd.DataFrame(resposta.data)
+    except Exception as e:
+        # Se der erro de tabela não encontrada, mostraremos na tela o motivo real
+        st.error(f"Erro detalhado do banco: {e}")
     return pd.DataFrame()
 
 # --- INTERFACE DO APLICATIVO ---
